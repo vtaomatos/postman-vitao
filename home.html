@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <title>Postman - Vitão</title>
+  </head>
+  <body>
+    <style>
+
+
+        #adc_campos_form {
+            margin-bottom:50px;
+        }
+
+        #enviar {
+            margin-bottom:50px;
+        }
+
+        .del-row {
+            margin-left:50px;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: #f00;
+            border: solid 1px #a20;
+            border-radius:3px;
+        }
+
+        .del-row:hover{
+            cursor: pointer;
+        }
+    </style>
+
+
+
+    <div class="container" style="margin-top:50px;">
+        
+        <div class="row">
+            <h1 style="text-align:center;color:#fff;width:100%;background-color:#e9ecef;border:solid 1px #ced4da;border-radius:3px;color:#000;">Simule requisi��es aqui</h1>
+        </div>
+        
+        <form id="form1" action="" method="">
+            <div class="row">
+                <label for="basic-url" style="font-weight: bold;">URL:</label>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3">https://</span>
+                    </div>
+                    <input type="text" class="form-control" id="url" aria-describedby="basic-addon3">
+                    <select class="custom-select col-md-1" id="method">
+                        <option value="POST">POST</option>
+                        <option value="GET">GET</option>
+                    </select>
+                </div>
+                <p class="alert alert-dark" style="text-align:center;color:#fff;width:100%;background-color:#e9ecef;border-color:#ced4da;color:#000;">
+                    Corpo da requisi��o
+                </p>
+            </div>
+    
+            <div class="row">
+                <p class="" style="font-weight:bold;margin-right:50px">
+                    chave
+                </p>
+    
+                <p class="col-md-offset-6 col-md-3" style="font-weight:bold;margin-right:50px">
+                    valor
+                </p>
+            </div>
+            <div id="row" class="row">
+                <div id="input-group" class="input-group mb-3">
+                    <div id="input-group-prepend" class="input-group-prepend">
+                        <div id="input-group-text_chave" class="input-group-text">
+                            Chave
+                        </div>
+                        <input id="chave" class="form-control input-chave col-md-8" type="text">
+                        <div id="input-group-text_valor" class="input-group-text">
+                            Valor
+                        </div>
+                        <input id="valor" class="form-control input-chave col-md-8" type="text">
+                    </div>
+                </div>
+                <button id="enviar" type="button" class="btn btn-success">
+                    Enviar requisi��o
+                </button>
+            </div>
+
+        </form>
+
+        <div class="row">
+            <button id="adc_campos_form" type="button" class="btn btn-primary">
+                Adicionar Campo no form
+            </button>
+        </div>  
+        <div class="row">
+            <textarea id="log">Log</textarea>
+            <p id="resposta"></p>
+        </div>
+    </div>
+
+
+
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script>
+            var id_row = 0;
+
+            //Bot�o de adc row
+            $("#adc_campos_form").click(function(){
+                id_row++;
+
+                var row = $('<div>', {
+                    id: 'row'+id_row,
+                    class: 'row',
+                }).appendTo('#form1');
+
+                var input_group = $('<div>', {
+                    id: 'input-group'+id_row,
+                    class: 'input-group mb-3',
+                }).appendTo('#row'+id_row);
+
+                var input_group_prepend = $('<div>', {
+                    id: 'input-group-prepend'+id_row,
+                    class: 'input-group-prepend',
+                }).appendTo('#input-group'+id_row);
+
+                var row = $('<div>', {
+                    id: 'input-group-text_chave'+id_row,
+                    class: 'input-group-text',
+                    html: 'Chave'
+                }).appendTo('#input-group-prepend'+id_row);
+
+                var input_group_prepend = $('<input>', {
+                    id: 'chave_'+id_row,
+                    class: 'form-control input-chave col-md-6',
+                    'type':'text'
+                }).appendTo('#input-group-prepend'+id_row);
+                
+                var row = $('<div>', {
+                    id: 'input-group-text_valor'+id_row,
+                    class: 'input-group-text',
+                    html: 'Valor'
+                }).appendTo('#input-group-prepend'+id_row);
+
+                var input_group_prepend = $('<input>', {
+                    id: 'valor_'+id_row,
+                    class: 'form-control input-chave col-md-6',
+                    'type':'text'
+                }).appendTo('#input-group-prepend'+id_row);
+
+                var deletar_row = $('<button>', {
+                    id: 'del_'+id_row,
+                    class: 'del-row',
+                    html: 'x',
+                    'type': 'button'
+                }).appendTo('#input-group-prepend'+id_row);
+
+
+                //A��o do bot�o de deletar (x)
+                $(".del-row").click(function(){
+                    var row = $(this).attr('id');
+                    row = row.replace("del_","");
+
+                    var deletar_row = $('#row'+row).remove();
+
+                });
+
+            });
+
+
+            $('#enviar').click(function(){
+                var tipo = $("#method").val();
+                var url = $("#url").val();
+                var dados = "";
+
+                var elementos = document.querySelectorAll("input[id^=chave_]");
+
+                $.each(elementos,function(index, value){
+                    var chave = $(this).val();
+                    var indice_chave = $(this).attr("id").replace("chave_","");
+
+                    if (chave != "") {
+                        var conteudo = $("#valor_"+indice_chave).val();
+                        dados += chave + ":" + conteudo + ",";
+                    }
+                });
+                dados = dados.substring(0, dados.length-1);
+                
+                $.ajax({
+                    type:tipo,
+                    url:"http://"+url.replace("http://",""),
+                    dataType: 'json',
+                    data:{dados},
+                    beforeSend : function(){
+                        $("#resposta").html("ENVIANDO...");
+                    },
+                    success: function(e){
+                        var log = $('#log').val();
+                        $('#log').html(log + "<br> ____________ <br>Requisi��o sucesso! <br> C�digo: " + e.code+ "<br>");
+                            $('#resposta').html("<pre> <code>"+JSON.stringify(e,null,4)+"</code> </pre>");
+                    },
+                    error: function(msg){
+                        $('#resposta').text(JSON.stringify(msg));
+                    }
+                });
+            });
+
+
+            
+
+
+            
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="js/bootstrap.min.js" ></script>
+  </body>
+</html>
